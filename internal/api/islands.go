@@ -103,3 +103,7 @@ func (c *Client) GetRetention(ctx context.Context, code string, p MetricsParams)
 	}
 	return &out, nil
 }
+
+// EncodePublic returns the URL values the client would send for this MetricsParams.
+// Used by the commands package when it needs to build a raw request path.
+func (p MetricsParams) EncodePublic() url.Values { return p.encode() }
