@@ -1,0 +1,31 @@
+{
+  "links": {
+    "next": "/ecosystem/v1/islands?after=ODQ5NS0zMTc3LTY5NDU%3D&size=2",
+    "prev": null
+  },
+  "meta": {
+    "count": 2,
+    "page": {
+      "prevCursor": null,
+      "nextCursor": "ODQ5NS0zMTc3LTY5NDU="
+    }
+  },
+  "data": [
+    {
+      "code": "7022-1566-6527",
+      "creatorCode": "daryadidi",
+      "title": "BRAINROT RACE",
+      "createdIn": "UEFN",
+      "tags": ["race", "tycoon", "just for fun", "action"],
+      "meta": {"page": {"cursor": "NzAyMi0xNTY2LTY1Mjc="}}
+    },
+    {
+      "code": "8495-3177-6945",
+      "creatorCode": "maphits",
+      "title": "ULTIMATE FIRE ZONE",
+      "createdIn": "UEFN",
+      "tags": ["one shot", "gun game", "free for all", "casual"],
+      "meta": {"page": {"cursor": "ODQ5NS0zMTc3LTY5NDU="}}
+    }
+  ]
+}
