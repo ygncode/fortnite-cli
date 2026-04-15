@@ -1,0 +1,13 @@
+{
+  "averageMinutesPerPlayer": null,
+  "peakCCU": [
+    {"value": 120, "timestamp": "2026-04-14"},
+    {"value": 95, "timestamp": "2026-04-15"}
+  ],
+  "favorites": null,
+  "minutesPlayed": null,
+  "recommendations": null,
+  "plays": null,
+  "uniquePlayers": null,
+  "retention": null
+}

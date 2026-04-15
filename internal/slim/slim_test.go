@@ -34,3 +34,19 @@ func TestSlimIslandList(t *testing.T) {
 	require.NoError(t, err)
 	assertJSONEqual(t, expected, got)
 }
+
+func TestSlimBundledMetricsDayInterval(t *testing.T) {
+	raw := readFile(t, "testdata/raw/metrics_bundled.json")
+	expected := readFile(t, "testdata/slim/metrics_bundled.json")
+
+	got, err := BundledMetrics(raw, "day")
+	require.NoError(t, err)
+	assertJSONEqual(t, expected, got)
+}
+
+func TestRoundTimestamp(t *testing.T) {
+	require.Equal(t, "2026-04-14", roundTimestamp("2026-04-14T00:00:00.000Z", "day"))
+	require.Equal(t, "2026-04-14T07:00", roundTimestamp("2026-04-14T07:00:00.000Z", "hour"))
+	require.Equal(t, "2026-04-14T07:20", roundTimestamp("2026-04-14T07:20:00.000Z", "minute"))
+	require.Equal(t, "garbage", roundTimestamp("garbage", "day"))
+}
