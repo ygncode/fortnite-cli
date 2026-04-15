@@ -153,6 +153,54 @@ func slimRetentionArray(arr []any, interval string) any {
 	return slim
 }
 
+// MetricResponse slims a single-metric response (peak-ccu, plays, etc.).
+// When all interval values are non-null, the array is preserved. When all are
+// null, we keep the array (unlike bundled metrics) since the single-metric
+// endpoint is queried precisely to see the series; collapsing to null would
+// discard what the caller asked for.
+func MetricResponse(raw []byte, interval string) ([]byte, error) {
+	var in struct {
+		Intervals []map[string]any `json:"intervals"`
+	}
+	if err := json.Unmarshal(raw, &in); err != nil {
+		return nil, fmt.Errorf("slim metric: decode: %w", err)
+	}
+	out := struct {
+		Intervals []map[string]any `json:"intervals"`
+	}{Intervals: make([]map[string]any, 0, len(in.Intervals))}
+	for _, item := range in.Intervals {
+		ts, _ := item["timestamp"].(string)
+		out.Intervals = append(out.Intervals, map[string]any{
+			"value":     item["value"],
+			"timestamp": roundTimestamp(ts, interval),
+		})
+	}
+	return json.Marshal(out)
+}
+
+// Retention slims a retention response. Always uses day granularity since
+// retention is day-only per the API spec.
+func Retention(raw []byte) ([]byte, error) {
+	var in struct {
+		Intervals []map[string]any `json:"intervals"`
+	}
+	if err := json.Unmarshal(raw, &in); err != nil {
+		return nil, fmt.Errorf("slim retention: decode: %w", err)
+	}
+	out := struct {
+		Intervals []map[string]any `json:"intervals"`
+	}{Intervals: make([]map[string]any, 0, len(in.Intervals))}
+	for _, item := range in.Intervals {
+		ts, _ := item["timestamp"].(string)
+		out.Intervals = append(out.Intervals, map[string]any{
+			"d1":        item["d1"],
+			"d7":        item["d7"],
+			"timestamp": roundTimestamp(ts, "day"),
+		})
+	}
+	return json.Marshal(out)
+}
+
 // roundTimestamp truncates an ISO8601 timestamp to the given interval granularity.
 // day → "2026-04-14", hour → "2026-04-14T07:00", minute → "2026-04-14T07:20".
 // Returns the input unchanged if it can't be parsed.

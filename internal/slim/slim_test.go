@@ -44,6 +44,24 @@ func TestSlimBundledMetricsDayInterval(t *testing.T) {
 	assertJSONEqual(t, expected, got)
 }
 
+func TestSlimMetricHourInterval(t *testing.T) {
+	raw := readFile(t, "testdata/raw/metric_peak_ccu.json")
+	expected := readFile(t, "testdata/slim/metric_peak_ccu.json")
+
+	got, err := MetricResponse(raw, "hour")
+	require.NoError(t, err)
+	assertJSONEqual(t, expected, got)
+}
+
+func TestSlimRetention(t *testing.T) {
+	raw := readFile(t, "testdata/raw/retention.json")
+	expected := readFile(t, "testdata/slim/retention.json")
+
+	got, err := Retention(raw)
+	require.NoError(t, err)
+	assertJSONEqual(t, expected, got)
+}
+
 func TestRoundTimestamp(t *testing.T) {
 	require.Equal(t, "2026-04-14", roundTimestamp("2026-04-14T00:00:00.000Z", "day"))
 	require.Equal(t, "2026-04-14T07:00", roundTimestamp("2026-04-14T07:00:00.000Z", "hour"))
