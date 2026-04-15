@@ -14,7 +14,6 @@ type singleMetricSpec struct {
 
 var singleMetricSpecs = []singleMetricSpec{}
 
-func newGetCmd(_ *GlobalFlags) *cobra.Command { return &cobra.Command{Use: "get", Hidden: true} }
 func newMetricsCmd(_ *GlobalFlags) *cobra.Command     { return &cobra.Command{Use: "metrics", Hidden: true} }
 func newSingleMetricCmd(_ *GlobalFlags, _ singleMetricSpec) *cobra.Command {
 	return &cobra.Command{Hidden: true}
