@@ -14,16 +14,7 @@ type singleMetricSpec struct {
 
 var singleMetricSpecs = []singleMetricSpec{}
 
-// listFlags is used by getRaw/listQueryValues helpers in root.go; a fuller
-// version with bound flags lands in Task 11.
-type listFlags struct {
-	Size   int
-	After  string
-	Before string
-}
-
-func newListCmd(_ *GlobalFlags) *cobra.Command        { return &cobra.Command{Use: "list", Hidden: true} }
-func newGetCmd(_ *GlobalFlags) *cobra.Command         { return &cobra.Command{Use: "get", Hidden: true} }
+func newGetCmd(_ *GlobalFlags) *cobra.Command { return &cobra.Command{Use: "get", Hidden: true} }
 func newMetricsCmd(_ *GlobalFlags) *cobra.Command     { return &cobra.Command{Use: "metrics", Hidden: true} }
 func newSingleMetricCmd(_ *GlobalFlags, _ singleMetricSpec) *cobra.Command {
 	return &cobra.Command{Hidden: true}
