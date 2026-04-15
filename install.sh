@@ -5,7 +5,8 @@
 set -eu
 
 REPO="ygncode/fortnite-cli"
-BIN="fortnite"
+PROJECT="fortnite-cli" # matches .goreleaser.yaml project_name — used in archive filename
+BIN="fortnite"         # binary name inside the archive
 INSTALL_DIR="${FORTNITE_INSTALL_DIR:-$HOME/.local/bin}"
 
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -39,7 +40,7 @@ if [ -z "${tag:-}" ]; then
   exit 1
 fi
 
-archive="${BIN}_${tag#v}_${os}_${arch}.${ext}"
+archive="${PROJECT}_${tag#v}_${os}_${arch}.${ext}"
 url="https://github.com/$REPO/releases/download/$tag/$archive"
 checksums_url="https://github.com/$REPO/releases/download/$tag/checksums.txt"
 
