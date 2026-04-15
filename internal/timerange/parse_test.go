@@ -75,3 +75,12 @@ func TestParseDefaults(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, now.Add(-60*time.Minute), rMin.From)
 }
+
+func TestParseRejectsMalformedDays(t *testing.T) {
+	now := time.Date(2026, 4, 15, 12, 0, 0, 0, time.UTC)
+	cases := []string{"7dgarbage", "dd", "-1d", "abcd", "7d7"}
+	for _, tc := range cases {
+		_, _, err := Parse(Input{Last: tc, Interval: "day"}, now)
+		require.Error(t, err, "expected error for %q", tc)
+	}
+}

@@ -4,6 +4,7 @@ package timerange
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -88,8 +89,9 @@ func Parse(in Input, now time.Time) (Range, string, error) {
 // parseDuration accepts "24h", "60m", "7d", "30s" — i.e. Go duration syntax plus "d" for days.
 func parseDuration(s string) (time.Duration, error) {
 	if strings.HasSuffix(s, "d") {
-		var days int
-		if _, err := fmt.Sscanf(s, "%dd", &days); err != nil || days < 0 {
+		prefix := strings.TrimSuffix(s, "d")
+		days, err := strconv.Atoi(prefix)
+		if err != nil || days < 0 {
 			return 0, fmt.Errorf("bad duration %q", s)
 		}
 		return time.Duration(days) * 24 * time.Hour, nil
