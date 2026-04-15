@@ -1,0 +1,13 @@
+# Binaries
+/fortnite
+/dist/
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
