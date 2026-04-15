@@ -39,11 +39,12 @@ func DefaultClient(timeout time.Duration) *Client {
 // APIError is returned for non-2xx responses. It is also returned when
 // all retries are exhausted.
 type APIError struct {
-	Status  int
-	Code    string // populated from ErrorResponse.errorCode when decoded
-	Message string // populated from ErrorResponse.errorMessage or raw body
-	UUID    string // populated from ErrorResponse.uuid when present
-	Body    string // raw body for non-JSON responses (429 is text/plain)
+	Status     int
+	Code       string // populated from ErrorResponse.errorCode when decoded
+	Message    string // populated from ErrorResponse.errorMessage or raw body
+	UUID       string // populated from ErrorResponse.uuid when present
+	Body       string // raw body for non-JSON responses (429 is text/plain)
+	RetryAfter string // Retry-After response header (seconds, or empty)
 }
 
 func (e *APIError) Error() string {
@@ -75,7 +76,7 @@ func (c *Client) Get(ctx context.Context, path string, query url.Values, out any
 			wait := c.RetryBase << (attempt - 1)
 			// Honor server-provided Retry-After if larger.
 			if apiErr, ok := lastErr.(*APIError); ok && apiErr.Status == http.StatusTooManyRequests {
-				if ra := parseRetryAfter(apiErr.Body); ra > wait {
+				if ra := parseRetryAfter(apiErr.RetryAfter); ra > wait {
 					wait = ra
 				}
 			}
@@ -122,7 +123,7 @@ func (c *Client) Get(ctx context.Context, path string, query url.Values, out any
 		}
 
 		// Build APIError.
-		apiErr := &APIError{Status: resp.StatusCode, Body: string(body)}
+		apiErr := &APIError{Status: resp.StatusCode, Body: string(body), RetryAfter: resp.Header.Get("Retry-After")}
 		if ct := resp.Header.Get("Content-Type"); bytes.Contains([]byte(ct), []byte("json")) {
 			var decoded ErrorResponse
 			if err := json.Unmarshal(body, &decoded); err == nil {

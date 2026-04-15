@@ -75,6 +75,35 @@ func TestClientNoRetryFlag(t *testing.T) {
 	require.Equal(t, http.StatusTooManyRequests, apiErr.Status)
 }
 
+func TestClientRetryAfterHeaderHonored(t *testing.T) {
+	// First response sends Retry-After: 1 (1 second). With RetryBase=10ms and
+	// attempt=1, exponential backoff would wait 10ms — the header should dominate.
+	var calls int32
+	var gap time.Duration
+	var lastCall time.Time
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		now := time.Now()
+		if atomic.LoadInt32(&calls) == 1 {
+			gap = now.Sub(lastCall)
+		}
+		lastCall = now
+		n := atomic.AddInt32(&calls, 1)
+		if n == 1 {
+			w.Header().Set("Retry-After", "1")
+			http.Error(w, "slow down", http.StatusTooManyRequests)
+			return
+		}
+		_, _ = w.Write([]byte(`{"data":[],"links":{"prev":null,"next":null},"meta":{"count":0,"page":{"prevCursor":"","nextCursor":""}}}`))
+	}))
+	defer srv.Close()
+
+	c := newTestClient(srv.URL)
+	var resp IslandListResponse
+	require.NoError(t, c.Get(context.Background(), "/islands", nil, &resp))
+	require.Equal(t, int32(2), atomic.LoadInt32(&calls))
+	require.GreaterOrEqual(t, gap, 900*time.Millisecond, "Retry-After header should have forced at least ~1s wait, got %v", gap)
+}
+
 func TestClientDecodes4xxError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
